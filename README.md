@@ -264,7 +264,7 @@ gcloud projects add-iam-policy-binding PROJECT_ID \
 > 500 Seats 정원이 거의 찬 시점에는 미할당 임직원이 우연히 링크를 클릭해 잔여 `Seat`를 선점하지 못하도록 **`Assign licenses automatically`를 `OFF`로 전환**하고, `Export all users (CSV)`로 `Seat` 할당 후 14일 이상 한 번도 접속하지 않은 계정을 즉시 식별합니다.
 
 1. 좌측 메뉴 **`Gemini Enterprise` > `Manage users`** 로 이동합니다.
-2. 상단 **`Assign licenses automatically`** Checkbox를 해제(`OFF`)하여 지정된 입사자·승인 대상자에게만 `Seat`가 할당되도록 보호합니다.
+2. 상단 **`Assign licenses automatically`** Checkbox를 해제(`OFF`)하여 승인된 대상자에게만 `Seat`가 할당되도록 보호합니다.
 3. **`Export all users`** 를 클릭해 전체 명단을 CSV로 내려받습니다:
    - `ASSIGNED` 상태이면서 **`last_login_time` 열이 비어 있는 계정** → `Seat` 할당 후 한 번도 Sign-in하지 않은 1차 독려/회수 대상
    - CSV의 상태 값은 `ASSIGNED` · `NO_LICENSE` · `BLOCKED` 세 가지입니다. `Seat` 없이 접속을 시도한 사용자는 `REST API`의 `licenseAssignmentState = NO_LICENSE_ATTEMPTED_LOGIN` Filter로 조회합니다(Step 3-2).
@@ -274,10 +274,10 @@ gcloud projects add-iam-policy-binding PROJECT_ID \
 
 ---
 
-### Step 3-2. `Discovery Engine UserStore REST API` 기반 입·퇴사 자동화 연동하기
+### Step 3-2. `Discovery Engine UserStore REST API` 기반 `Seat` 수명주기(할당·회수) 자동화 연동하기
 
 > **핵심 포인트:**  
-> `Google Workspace`를 쓰지 않으므로 사내 계정 신청·퇴사 변동에 따른 `Seat` 자동화 `API`도 **`Discovery Engine UserStore REST API`** 하나로 일원화됩니다. `batchUpdateUserLicenses` 호출 한 번으로 **신규 입사자 `Seat` 할당(`licenseConfig` 명시)** 와 **퇴사·휴면자 `Seat` 회수(`licenseConfig` 생략 + `deleteUnassignedUserLicenses: true`)** 를 동시에 처리합니다.
+> `Google Workspace`를 쓰지 않으므로 사내 계정 신청·퇴사 변동에 따른 `Seat` 자동화 `API`도 **`Discovery Engine UserStore REST API`** 하나로 일원화됩니다. `batchUpdateUserLicenses` 호출 한 번으로 **신규 승인 대상자 `Seat` 할당(`licenseConfig` 명시)** 와 **퇴사·휴면자 `Seat` 회수(`licenseConfig` 생략 + `deleteUnassignedUserLicenses: true`)** 를 동시에 처리합니다.
 
 ![Non-GWS Seat 수명주기 연동 및 30일 미사용 Seat 회수 Architecture](assets/screenshots/diagram-ge-admin-2-license-lifecycle-automation.png)
 
@@ -292,7 +292,7 @@ curl -sS -X GET \
   -H "X-Goog-User-Project: PROJECT_ID" \
   "https://discoveryengine.googleapis.com/v1/projects/PROJECT_ID/locations/global/userStores/default_user_store/userLicenses?pageSize=1000"
 
-# 2) 신규 입사자 Seat 할당 + 퇴사/휴면자 Seat 회수 일괄 실행 (batchUpdateUserLicenses)
+# 2) 신규 승인 대상자 Seat 할당 + 퇴사/미사용 Seat 회수 일괄 실행 (batchUpdateUserLicenses)
 curl -sS -X POST \
   -H "Authorization: Bearer $(gcloud auth print-access-token)" \
   -H "X-Goog-User-Project: PROJECT_ID" \
