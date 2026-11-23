@@ -16,7 +16,7 @@
 | :--- | :---: | :--- |
 | **Part 1 (30분)**<br/>`Admin L100 · M1` | `GCP Console` & `IAM` | • 배포 **`Location` 불변 원칙** 이해 및 추가 비용 `$0`의 **운영(`App 1`) · 검증(`App 2`) 2-App 분리**<br/>• **`Non-GWS` 표준 인증(`WIF` vs. `Cloud Identity Free`)** 및 일반 사용자 **`Antigravity` 차단 `Custom IAM Role`** |
 | **Part 2 (40분)**<br/>`Admin L100 · M2` | `GE` & `Antigravity` | • 일 **`80,000 Query`**(`Web`) vs. 주 **`USD 1,250 Credit`**(`Antigravity`) 통제(`PAYG = Disabled`, `Multiplier = 10`)<br/>• `GWS` 없는 **`Canvas` 로컬 `Download`(`.html/.docx/.pdf/.pptx`)** 활성화 및 **`Antigravity` 초기 셋업** |
-| **Part 3 (35분)**<br/>`Admin L200 · M3` | `UserStore API` & `Log Analytics` | • **`UserStore REST API`**(`userLicenses.list` · `batchUpdateUserLicenses`) 인사 자동 연동<br/>• **`last_login_time`과 `Antigravity inference_response` `Log`** 를 함께 확인하는 30일 미사용 Seat 회수 |
+| **Part 3 (35분)**<br/>`Admin L200 · M3` | `UserStore API` & `Log Analytics` | • **`UserStore REST API`**(`userLicenses.list` · `batchUpdateUserLicenses`) `Seat` 수명주기 자동 연동<br/>• **`last_login_time`과 `Antigravity inference_response` `Log`** 를 함께 확인하는 30일 미사용 Seat 회수 |
 | **Part 4 (30분)**<br/>`Admin L200 · M4` | `SDP` · `Armor` · `AG` | • `Web App` 2계층 방어: 첨부 반입 차단(**`SDP`**, `roles/dlp.user` 선행) + 입출력 분리 **`Model Armor`(`locations/us`)**<br/>• **`Antigravity` 로컬 실행 보안**: 작업 `Folder` 외부 `Deny`, `Terminal = Require review`, `Sandbox = ON`, `MCP Allowlist` |
 | **Part 5 (15분)**<br/>`Admin L200+ · M5` | `Logging` & `Connectors` | • **5대 감사 · `Token` `Log Stream`** 외부 `SIEM`(`Pub/Sub` Pull) 연동 및 **`Microsoft 365 data store` (`GA`)** 확장<br/>• 운영 `Google Cloud Console` **10대 필수 점검 `Checklist`** 실시간 완료 체크 및 `Customer Care` 지원 체계 |
 
@@ -36,7 +36,7 @@
 | :---: | :--- | :---: | :--- |
 | **01** | [`01_IAM_ge_standard_chat_no_antigravity_role.yaml`](./files/01_IAM_ge_standard_chat_no_antigravity_role.yaml) | **Part 1** | `Gemini Enterprise User` 역할의 권한 135개에서 `businessaicode.*` 5개와 `Project` 단위 역할에 넣을 수 없는 1개를 뺀 129개 권한의 `Custom IAM Role` 정의(일반 임직원의 `Antigravity` 사용 차단용) |
 | **01b** | [`01b_IAM_parallel_wif_vs_cloud_identity_bindings.sh`](./files/01b_IAM_parallel_wif_vs_cloud_identity_bindings.sh) | **Part 1** | **`Option A (WIF principalSet://)` vs. `Option B (Cloud Identity Free group:)`** 두 방식의 직무별 `IAM` 권한 부여 명령어를 나란히 비교·실행하는 `Script` |
-| **02** | [`02_UserStore_license_list_and_batch_update.sh`](./files/02_UserStore_license_list_and_batch_update.sh) | **Part 3** | 사내 인사 Batch `Server`에서 전체 `License` 현황(`lastLoginTime`) 조회 및 입·퇴사자 일괄 Seat 할당·회수를 수행하는 `UserStore REST API` Template |
+| **02** | [`02_UserStore_license_list_and_batch_update.sh`](./files/02_UserStore_license_list_and_batch_update.sh) | **Part 3** | 사내 계정 신청·퇴사 연동 Batch `Server`에서 전체 `Seat` 현황(`lastLoginTime`) 조회 및 일괄 `Seat` 할당·회수를 수행하는 `UserStore REST API` Template |
 | **03** | [`03_Observability_Analytics_seat_activity_30d.sql`](./files/03_Observability_Analytics_seat_activity_30d.sql) | **Part 3** | Seat 회수 전에 `Antigravity inference_response` `Log`에서 사용자별 최근 30일 호출을 집계하는 `SQL` |
 | **04** | [`04_Security_sdp_and_model_armor_setup.sh`](./files/04_Security_sdp_and_model_armor_setup.sh) | **Part 4** | `SDP` 정책 연결 전에 필요한 `roles/dlp.user` 부여와 `locations/us` 입력용 `Model Armor Template` 생성 `Script` |
 | **05** | [`05_Antigravity_mcp_allowlist_sample.json`](./files/05_Antigravity_mcp_allowlist_sample.json) | **Part 4** | `Settings > AI developer tools`의 `Allowed server configuration`에 붙여넣는 사내 승인 `local_servers` · `remote_servers` `JSON` 예시 |
@@ -168,7 +168,9 @@ gcloud iam roles describe geStandardChatUser --project=PROJECT_ID \
    - **일반 현업 임직원 `Group` (`Web App` 전용)**: 방금 만든 **`GE Standard Chat User (No Antigravity)`** (`projects/PROJECT_ID/roles/geStandardChatUser`)
    - **승인된 개발자 `Group` (`GE` + `Antigravity` 허용)**: 표준 **`Gemini Enterprise User`** (`roles/discoveryengine.agentspaceUser`)
    - **고객사 · 운영 `Partner` `Admin`**: `roles/discoveryengine.agentspaceAdmin` + `roles/serviceusage.serviceUsageConsumer` (**주의: 관리자가 직접 `Antigravity`를 실행·테스트하려면 `agentspaceUser` 역할도 함께(`AND` 조건) 부여해야 합니다.**)
-   - **인사 · `SIEM` 자동화 `Service Account`**: `roles/discoveryengine.admin` (인사 연동용), `roles/logging.privateLogViewer` (`Log` 수집용)
+   - **계정(`Seat`) 연동 · `SIEM` 수집용 전용 `Service Account` (자동화 연동 시 용도별 분리 생성, 초기 수동 운영 시 생략 가능)**:
+     - `Seat` 프로비저닝 Batch `SA`: `discoveryengine.userStores.listUserLicenses`, `discoveryengine.userStores.batchUpdateUserLicenses`, `serviceusage.services.use` 3개 권한 `Custom Role` 권장 (간편 구성 시 `roles/discoveryengine.agentspaceAdmin` / 주의: `viewer` 역할에는 `listUserLicenses` 권한 없음)
+     - 외부 `SIEM` 수집기 `SA`: `Pub/Sub` 구독 시 `roles/pubsub.subscriber`, `Logging API` 직접 조회 시 `roles/logging.viewer` · `privateLogViewer` (`Log Router Sink` 자체는 Google 관리형 `Writer Identity`가 수행)
 
 **화면 확인 포인트:** (`① Canvas용 immersiveArtifacts.* 권한 유지` → `② businessaicode.* 5종 제거로 일반 임직원의 Antigravity 사용 차단` → `③ Admin+User AND 조건 확인`)
 ![Step 1-3 일반 임직원용 Antigravity 차단 Custom IAM Role 상세 및 Admin AND 권한 주의사항 (실제 Console 화면 촬영 · 식별자 일반화 편집)](assets/screenshots/ui_03_iam_custom_role_no_agy.png)
@@ -254,7 +256,7 @@ gcloud projects add-iam-policy-binding PROJECT_ID \
 
 ---
 
-# [Part 3 · Admin L200] UserStore REST API 인사 자동화 & 통합 Seat 회수
+# [Part 3 · Admin L200] UserStore REST API Seat 수명주기 자동화 & 통합 Seat 회수
 
 ### Step 3-1. `Manage users` 정원 보호(`Auto-assign OFF`), `CSV` 추출 및 대기 수요 파악하기
 
@@ -275,11 +277,11 @@ gcloud projects add-iam-policy-binding PROJECT_ID \
 ### Step 3-2. `Discovery Engine UserStore REST API` 기반 입·퇴사 자동화 연동하기
 
 > **핵심 포인트:**  
-> `Google Workspace`를 쓰지 않으므로 인사 연동 `API`도 **`Discovery Engine UserStore REST API`** 하나로 일원화됩니다. `batchUpdateUserLicenses` 호출 한 번으로 **신규 입사자 `Seat` 할당(`licenseConfig` 명시)** 와 **퇴사·휴면자 `Seat` 회수(`licenseConfig` 생략 + `deleteUnassignedUserLicenses: true`)** 를 동시에 처리합니다.
+> `Google Workspace`를 쓰지 않으므로 사내 계정 신청·퇴사 변동에 따른 `Seat` 자동화 `API`도 **`Discovery Engine UserStore REST API`** 하나로 일원화됩니다. `batchUpdateUserLicenses` 호출 한 번으로 **신규 입사자 `Seat` 할당(`licenseConfig` 명시)** 와 **퇴사·휴면자 `Seat` 회수(`licenseConfig` 생략 + `deleteUnassignedUserLicenses: true`)** 를 동시에 처리합니다.
 
-![Non-GWS 인사 연동 및 GE+Antigravity 양방향 휴면 Seat 회수 Architecture](assets/screenshots/diagram-ge-admin-2-license-lifecycle-automation.png)
+![Non-GWS Seat 수명주기 연동 및 30일 미사용 Seat 회수 Architecture](assets/screenshots/diagram-ge-admin-2-license-lifecycle-automation.png)
 
-1. 사내 인사 연동 Batch용 `Service Account`에 `roles/discoveryengine.admin` 권한을 부여하고 모든 요청에 `X-Goog-User-Project: PROJECT_ID` `Header`를 포함합니다.
+1. 사람 관리자(`OAuth` 만료 · 과도한 삭제 권한)와 분리된 `Seat` 연동 전용 `Service Account`를 만들고 최소 권한(`discoveryengine.userStores.listUserLicenses`, `discoveryengine.userStores.batchUpdateUserLicenses`, `serviceusage.services.use` 3개 권한 `Custom Role`, 또는 간편 구성 시 `roles/discoveryengine.agentspaceAdmin`)을 부여한 뒤 모든 요청에 `X-Goog-User-Project: PROJECT_ID` `Header`를 포함합니다(`viewer` 역할에는 `listUserLicenses` 권한이 없습니다).
 2. 실습 `File` `02_UserStore_license_list_and_batch_update.sh`의 조회 및 일괄 변경 `REST API` 명령을 복사해 실행 구조를 확인합니다:
 
 ```bash

@@ -2,7 +2,10 @@
 # ==============================================================================
 # File 02: Discovery Engine UserStore REST API — List & Batch Assign/Reclaim
 # Target Environment: Non-GWS Enterprise (Gemini Enterprise + Google Antigravity)
-# Prerequisite IAM on HR Sync Service Account: roles/discoveryengine.admin
+# Prerequisite IAM on Seat Provisioning Service Account (Least Privilege):
+#   Custom Role with discoveryengine.userStores.listUserLicenses,
+#   discoveryengine.userStores.batchUpdateUserLicenses, serviceusage.services.use
+#   (or predefined roles/discoveryengine.agentspaceAdmin; note: viewer lacks listUserLicenses)
 # ==============================================================================
 set -euo pipefail
 
