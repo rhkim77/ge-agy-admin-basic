@@ -1,0 +1,24 @@
+{
+  "mcpServers": {
+    "local_servers": [
+      {
+        "id": "gopls-mcp-server",
+        "command": "go",
+        "args": [
+          "run",
+          "golang.org/x/tools/gopls@latest",
+          "mcp"
+        ]
+      }
+    ],
+    "remote_servers": [
+      {
+        "id": "bigquery"
+      },
+      {
+        "id": "corp-internal-mcp",
+        "url": "https://mcp.example-corp.com/mcp"
+      }
+    ]
+  }
+}
