@@ -242,12 +242,25 @@
       width: 100%; border-collapse: collapse; margin: 1rem 0 1.35rem; font-size: 0.89rem;
       border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden;
     }
+    .markdown-body table.idp-compare-table {
+      table-layout: fixed;
+    }
+    .markdown-body table.idp-compare-table th:nth-child(1),
+    .markdown-body table.idp-compare-table td:nth-child(1) { width: 16%; }
+    .markdown-body table.idp-compare-table th:nth-child(2),
+    .markdown-body table.idp-compare-table td:nth-child(2) { width: 42%; }
+    .markdown-body table.idp-compare-table th:nth-child(3),
+    .markdown-body table.idp-compare-table td:nth-child(3) { width: 42%; }
     .markdown-body th {
       background: #f1f3f4; color: var(--text-primary); font-weight: 700; text-align: left;
       padding: 0.65rem 0.85rem; border-bottom: 1px solid var(--border-color);
     }
     .markdown-body td {
       padding: 0.62rem 0.85rem; border-bottom: 1px solid #eceff1; vertical-align: top; color: var(--text-secondary);
+      overflow-wrap: anywhere; word-break: keep-all;
+    }
+    .markdown-body td code, .markdown-body th code {
+      overflow-wrap: anywhere; word-break: break-all; white-space: normal;
     }
     .markdown-body tr:last-child td { border-bottom: none; }
 
@@ -552,6 +565,12 @@
     }
 
     function enhanceParallelIdpTracks(container) {
+      container.querySelectorAll('table').forEach(tbl => {
+        const firstTh = tbl.querySelector('th');
+        if (firstTh && firstTh.textContent.includes('의사결정 비교 축')) {
+          tbl.classList.add('idp-compare-table');
+        }
+      });
       const h4s = Array.from(container.querySelectorAll('h4'));
       const optAH4 = h4s.find(h => h.textContent.includes('Option A 상세 구성'));
       const optBH4 = h4s.find(h => h.textContent.includes('Option B 상세 구성'));
