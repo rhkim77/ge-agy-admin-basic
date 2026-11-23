@@ -1,7 +1,7 @@
 # Gemini Enterprise & Google Antigravity Admin L100 · L200 실습 Portal
 
 > <strong>Non-GWS 기업 맞춤 Step-by-Step 관리자 실습 Guide</strong>  
-> **Google Workspace (GWS)** 를 사용하지 않고 **Gemini Enterprise Standard (500석, NotebookLM 포함)** 와 **Google Antigravity** 두 가지 핵심 Solution만 도입한 환경에 맞추어, **① `Console` 어디를 클릭하는지** → **② 어떤 `CLI` · `REST API` · `SQL` · `JSON`을 복사해 실행하는지** → **③ 설정 뒤 무엇을 확인하는지** 순서대로 따라오실 수 있도록 구성했습니다.  
+> **Google Workspace (GWS)** 를 사용하지 않고 **Gemini Enterprise Standard (500 Seats, NotebookLM 포함)** 와 **Google Antigravity** 두 가지 핵심 Solution만 도입한 환경에 맞추어, **① `Console` 어디를 클릭하는지** → **② 어떤 `CLI` · `REST API` · `SQL` · `JSON`을 복사해 실행하는지** → **③ 설정 뒤 무엇을 확인하는지** 순서대로 따라오실 수 있도록 구성했습니다.  
 > 본 Guide의 `Google Cloud Console` · `Gemini Enterprise Web App` · `agy CLI` 화면은 실제 테스트 환경을 촬영한 뒤, `Project ID` · `Domain` · `Account` 식별자만 일반 예시(`corp-ai-platform-prod`, `example-corp.com`)로 치환하고 강조 번호를 표시한 화면입니다.
 
 ---
@@ -16,7 +16,7 @@
 | :--- | :---: | :--- |
 | **Part 1 (30분)**<br/>`Admin L100 · M1` | `GCP Console` & `IAM` | • 배포 **`Location` 불변 원칙** 이해 및 추가 비용 `$0`의 **운영(`App 1`) · 검증(`App 2`) 2-App 분리**<br/>• **`Non-GWS` 표준 인증(`WIF` vs. `Cloud Identity Free`)** 및 일반 사용자 **`Antigravity` 차단 `Custom IAM Role`** |
 | **Part 2 (40분)**<br/>`Admin L100 · M2` | `GE` & `Antigravity` | • 일 **`80,000 Query`**(`Web`) vs. 주 **`USD 1,250 Credit`**(`Antigravity`) 통제(`PAYG = Disabled`, `Multiplier = 10`)<br/>• `GWS` 없는 **`Canvas` 로컬 `Download`(`.html/.docx/.pdf/.pptx`)** 활성화 및 **`Antigravity` 초기 셋업** |
-| **Part 3 (35분)**<br/>`Admin L200 · M3` | `UserStore API` & `Log Analytics` | • **`UserStore REST API`**(`userLicenses.list` · `batchUpdateUserLicenses`) 인사 자동 연동<br/>• **`last_login_time`과 `Antigravity inference_response` `Log`** 를 함께 확인하는 30일 미사용 좌석 회수 |
+| **Part 3 (35분)**<br/>`Admin L200 · M3` | `UserStore API` & `Log Analytics` | • **`UserStore REST API`**(`userLicenses.list` · `batchUpdateUserLicenses`) 인사 자동 연동<br/>• **`last_login_time`과 `Antigravity inference_response` `Log`** 를 함께 확인하는 30일 미사용 Seat 회수 |
 | **Part 4 (30분)**<br/>`Admin L200 · M4` | `SDP` · `Armor` · `AG` | • `Web App` 2계층 방어: 첨부 반입 차단(**`SDP`**, `roles/dlp.user` 선행) + 입출력 분리 **`Model Armor`(`locations/us`)**<br/>• **`Antigravity` 로컬 실행 보안**: 작업 `Folder` 외부 `Deny`, `Terminal = Require review`, `Sandbox = ON`, `MCP Allowlist` |
 | **Part 5 (15분)**<br/>`Admin L200+ · M5` | `Logging` & `Connectors` | • **5대 감사 · `Token` `Log Stream`** 외부 `SIEM`(`Pub/Sub` Pull) 연동 및 **`Microsoft 365 data store` (`GA`)** 확장<br/>• 운영 `Google Cloud Console` **10대 필수 점검 `Checklist`** 실시간 완료 체크 및 `Customer Care` 지원 체계 |
 
@@ -36,8 +36,8 @@
 | :---: | :--- | :---: | :--- |
 | **01** | [`01_IAM_ge_standard_chat_no_antigravity_role.yaml`](./files/01_IAM_ge_standard_chat_no_antigravity_role.yaml) | **Part 1** | `Gemini Enterprise User` 역할의 권한 135개에서 `businessaicode.*` 5개와 `Project` 단위 역할에 넣을 수 없는 1개를 뺀 129개 권한의 `Custom IAM Role` 정의(일반 임직원의 `Antigravity` 사용 차단용) |
 | **01b** | [`01b_IAM_parallel_wif_vs_cloud_identity_bindings.sh`](./files/01b_IAM_parallel_wif_vs_cloud_identity_bindings.sh) | **Part 1** | **`Option A (WIF principalSet://)` vs. `Option B (Cloud Identity Free group:)`** 두 방식의 직무별 `IAM` 권한 부여 명령어를 나란히 비교·실행하는 `Script` |
-| **02** | [`02_UserStore_license_list_and_batch_update.sh`](./files/02_UserStore_license_list_and_batch_update.sh) | **Part 3** | 사내 인사 Batch `Server`에서 전체 `License` 현황(`lastLoginTime`) 조회 및 입·퇴사자 일괄 배정·회수를 수행하는 `UserStore REST API` Template |
-| **03** | [`03_Observability_Analytics_seat_activity_30d.sql`](./files/03_Observability_Analytics_seat_activity_30d.sql) | **Part 3** | 좌석 회수 전에 `Antigravity inference_response` `Log`에서 사용자별 최근 30일 호출을 집계하는 `SQL` |
+| **02** | [`02_UserStore_license_list_and_batch_update.sh`](./files/02_UserStore_license_list_and_batch_update.sh) | **Part 3** | 사내 인사 Batch `Server`에서 전체 `License` 현황(`lastLoginTime`) 조회 및 입·퇴사자 일괄 Seat 할당·회수를 수행하는 `UserStore REST API` Template |
+| **03** | [`03_Observability_Analytics_seat_activity_30d.sql`](./files/03_Observability_Analytics_seat_activity_30d.sql) | **Part 3** | Seat 회수 전에 `Antigravity inference_response` `Log`에서 사용자별 최근 30일 호출을 집계하는 `SQL` |
 | **04** | [`04_Security_sdp_and_model_armor_setup.sh`](./files/04_Security_sdp_and_model_armor_setup.sh) | **Part 4** | `SDP` 정책 연결 전에 필요한 `roles/dlp.user` 부여와 `locations/us` 입력용 `Model Armor Template` 생성 `Script` |
 | **05** | [`05_Antigravity_mcp_allowlist_sample.json`](./files/05_Antigravity_mcp_allowlist_sample.json) | **Part 4** | `Settings > AI developer tools`의 `Allowed server configuration`에 붙여넣는 사내 승인 `local_servers` · `remote_servers` `JSON` 예시 |
 | **06** | [`06_Logging_unified_5stream_sink.sh`](./files/06_Logging_unified_5stream_sink.sh) | **Part 5** | 5개 `Log Stream`을 외부 `SIEM`이 읽는 `Pub/Sub` Topic으로 보내는 `Log Sink` 생성 `Script`(사내 인바운드 방화벽 변경 없음) |
@@ -52,7 +52,7 @@
 
 > **핵심 포인트:**  
 > 1. `App` 생성 시 선택한 **`Location` (`global` 또는 `us` / `eu` Multi-Region)** 은 생성 이후 다른 지역으로 변경하거나 데이터를 자동 이전할 수 없습니다 (`global`: 최신 `Model`과 기능이 먼저 제공됨 / `us·eu`: `Access Transparency`처럼 Multi-Region이 필요한 통제를 쓸 때 선택).  
-> 2. `Gemini Enterprise` 좌석은 개별 `App`이 아니라 해당 `Project · Location`의 **`UserStore` 사용자(`userPrincipal`) 단위**로 배정됩니다. 따라서 운영용 **`App 1 (Prod)`** 외에 관리자·운영 `Partner` 전용 검증용 **`App 2 (Sandbox)`** 를 추가 생성해도 **추가 `License` 비용은 `$0`** 입니다.
+> 2. `Gemini Enterprise` `Seat`는 개별 `App`이 아니라 해당 `Project · Location`의 **`UserStore` 사용자(`userPrincipal`) 단위**로 할당됩니다. 따라서 운영용 **`App 1 (Prod)`** 외에 관리자·운영 `Partner` 전용 검증용 **`App 2 (Sandbox)`** 를 추가 생성해도 **추가 `License` 비용은 `$0`** 입니다.
 
 1. `Google Cloud Console` → 좌측 메뉴 **`Gemini Enterprise` > `Apps`** 진입 후 상단 **`Region`** 선택기가 **`global`**(또는 운영 대상 `Location`)로 맞춰져 있는지 확인합니다.
 2. **`+ CREATE APP`** 클릭 시 표시되는 `Location` 불변 안내를 확인하고 현업 임직원 전체용 **`App 1 (Prod)`** 과 관리자 사전 검증용 **`App 2 (Sandbox)`** 를 분리 구성합니다.
@@ -182,20 +182,20 @@ gcloud iam roles describe geStandardChatUser --project=PROJECT_ID \
 
 ---
 
-# [Part 2 · Admin L100] Standard 500석 Quota · Web App 로컬 반출 · Antigravity 초기 셋업
+# [Part 2 · Admin L100] Standard 500 Seats Quota · Web App 로컬 반출 · Antigravity 초기 셋업
 
-### Step 2-1. `Standard` 500석 공유 `Quota` · 주간 `Antigravity Credit` 확인 및 초과 과금 방지 설정하기
+### Step 2-1. `Standard` 500 Seats 공유 `Quota` · 주간 `Antigravity Credit` 확인 및 초과 과금 방지 설정하기
 
 > **핵심 포인트:**  
-> • **`GE Web App` (`1P Gemini` 전 계열)**: 좌석당 일 160회 × 500석 = **일 `80,000 Queries` 공유 `Pool`**. 구독 `Quota`는 Query 횟수로 계산하며 공식 `Quota` 표에는 Google `Model`별 차등이 없습니다.  
-> • **`Google Antigravity` (`Desktop` · `agy CLI` · `IDE Extension` 합산)**: 좌석당 월 `USD 10`(= 주 `USD 2.50`) × 500석 = **주당 `USD 1,250 Credit` 공유 `Pool`** (7일 주기 초기화). 횟수가 아닌 **달러 금액(`USD`) 기준 차감**이므로 대형 `Model`·장문 `Code Context` 호출 시 소진 속도가 빨라집니다.
+> • **`GE Web App` (`1P Gemini` 전 계열)**: `Seat`당 일 160회 × 500 Seats = **일 `80,000 Queries` 공유 `Pool`**. 구독 `Quota`는 Query 횟수로 계산하며 공식 `Quota` 표에는 Google `Model`별 차등이 없습니다.  
+> • **`Google Antigravity` (`Desktop` · `agy CLI` · `IDE Extension` 합산)**: `Seat`당 월 `USD 10`(= 주 `USD 2.50`) × 500 Seats = **주당 `USD 1,250 Credit` 공유 `Pool`** (7일 주기 초기화). 횟수가 아닌 **달러 금액(`USD`) 기준 차감**이므로 대형 `Model`·장문 `Code Context` 호출 시 소진 속도가 빨라집니다.
 
 1. 좌측 메뉴 **`Gemini Enterprise` > `Usage & spend`** 로 이동합니다.
 2. 타사 유료 `3P Model`(`Anthropic Claude Opus / Sonnet 5.5`: 기본 `Pool` 미포함, 첫 호출부터 `Token` 종량 과금)이나 한도 초과 호출로 예기치 않은 요금이 청구되지 않도록 **`Pay-as-you-go usage above quota = Disabled`** (기본값) 상태를 확인합니다.
 3. 특정 헤비 유저 1인이 전사 주간 `Antigravity Credit`(`USD 1,250`)을 독점 소진하지 못하도록 **`Limit any single-user's quota (Multiplier)` 값을 `10`** (1인당 주간 최대 `USD 25` 상한; 집중 통제 시 `5`)으로 입력하고 **`SAVE`** 를 클릭합니다.
 
 **화면 확인 포인트:** (`① Pay-as-you-go = Disabled 유지로 초과 과금 $0 보장` → `② Multiplier = 10 설정으로 개발자 1인당 주간 최대 $25 상한 적용`)
-![Step 2-1 Standard 500석 공유 Quota 및 Antigravity 주간 Credit 예산 보호 설정 화면 (실제 Console 화면 촬영 · 식별자 일반화 편집)](assets/screenshots/ui_04_usage_spend_quota.png)
+![Step 2-1 Standard 500 Seats 공유 Quota 및 Antigravity 주간 Credit 예산 보호 설정 화면 (실제 Console 화면 촬영 · 식별자 일반화 편집)](assets/screenshots/ui_04_usage_spend_quota.png)
 
 ---
 
@@ -238,7 +238,7 @@ gcloud projects add-iam-policy-binding PROJECT_ID \
 2. 개발자에게 Sign-in 방법을 안내합니다.
    - **`Antigravity` App**: 첫 화면에서 **`Use Business Account`** 를 누른 뒤 **`Continue with Google Cloud`** 로 Sign-in합니다.
    - **`agy CLI`**: **`Use a Google Cloud project`** 를 고른 다음 `Cloud Identity Free` 환경은 **`Continue with Google Cloud`**, 사내 `IdP`를 `WIF`로 연결한 환경은 **`Use advanced SSO config`** 를 선택합니다.
-   - 두 경우 모두 `License`가 배정된 `Project`를 지정합니다.
+   - 두 경우 모두 `Seat`가 할당된 `Project`를 지정합니다.
 
 **화면 확인 포인트 1 (`agy CLI` Sign-in 방식 선택):** 개인 계정용 `Google OAuth`가 아니라 **`Use a Google Cloud project`** 를 선택합니다.
 ![Step 2-3 agy CLI 첫 실행 화면: Sign-in 방식 선택 (agy CLI v1.1.21 직접 캡처, 버전에 따라 문구가 다를 수 있음)](assets/screenshots/agy_cli_signin_step1_method.png)
@@ -254,43 +254,43 @@ gcloud projects add-iam-policy-binding PROJECT_ID \
 
 ---
 
-# [Part 3 · Admin L200] UserStore REST API 인사 자동화 & 통합 좌석 회수
+# [Part 3 · Admin L200] UserStore REST API 인사 자동화 & 통합 Seat 회수
 
 ### Step 3-1. `Manage users` 정원 보호(`Auto-assign OFF`), `CSV` 추출 및 대기 수요 파악하기
 
 > **핵심 포인트:**  
-> 500석 정원이 거의 찬 시점에는 미할당 임직원이 우연히 링크를 클릭해 잔여 좌석을 선점하지 못하도록 **`Assign licenses automatically`를 `OFF`로 전환**하고, `Export all users (CSV)`로 배정 후 14일 이상 한 번도 접속하지 않은 계정을 즉시 식별합니다.
+> 500 Seats 정원이 거의 찬 시점에는 미할당 임직원이 우연히 링크를 클릭해 잔여 `Seat`를 선점하지 못하도록 **`Assign licenses automatically`를 `OFF`로 전환**하고, `Export all users (CSV)`로 `Seat` 할당 후 14일 이상 한 번도 접속하지 않은 계정을 즉시 식별합니다.
 
 1. 좌측 메뉴 **`Gemini Enterprise` > `Manage users`** 로 이동합니다.
-2. 상단 **`Assign licenses automatically`** Checkbox를 해제(`OFF`)하여 지정된 입사자·승인 대상자에게만 좌석이 배정되도록 보호합니다.
+2. 상단 **`Assign licenses automatically`** Checkbox를 해제(`OFF`)하여 지정된 입사자·승인 대상자에게만 `Seat`가 할당되도록 보호합니다.
 3. **`Export all users`** 를 클릭해 전체 명단을 CSV로 내려받습니다:
-   - `ASSIGNED` 상태이면서 **`last_login_time` 열이 비어 있는 계정** → 배정 후 한 번도 Sign-in하지 않은 1차 독려/회수 대상
-   - CSV의 상태 값은 `ASSIGNED` · `NO_LICENSE` · `BLOCKED` 세 가지입니다. 좌석 없이 접속을 시도한 사용자는 `REST API`의 `licenseAssignmentState = NO_LICENSE_ATTEMPTED_LOGIN` Filter로 조회합니다(Step 3-2).
+   - `ASSIGNED` 상태이면서 **`last_login_time` 열이 비어 있는 계정** → `Seat` 할당 후 한 번도 Sign-in하지 않은 1차 독려/회수 대상
+   - CSV의 상태 값은 `ASSIGNED` · `NO_LICENSE` · `BLOCKED` 세 가지입니다. `Seat` 없이 접속을 시도한 사용자는 `REST API`의 `licenseAssignmentState = NO_LICENSE_ATTEMPTED_LOGIN` Filter로 조회합니다(Step 3-2).
 
 **화면 확인 포인트:** (`① 정원 근접 시 Auto-Assign OFF` → `② Export all users로 CSV 추출` → `③ last_login_time이 빈 계정 확인`)
-![Step 3-1 Manage users 내 자동 배정 제어, CSV 내보내기 및 UserStore 상태 조회 화면 (실제 Console 화면 촬영 · 식별자 일반화 편집)](assets/screenshots/ui_07_manage_users_csv_reclaim.png)
+![Step 3-1 Manage users 내 자동 Seat 할당 제어, CSV 내보내기 및 UserStore 상태 조회 화면 (실제 Console 화면 촬영 · 식별자 일반화 편집)](assets/screenshots/ui_07_manage_users_csv_reclaim.png)
 
 ---
 
 ### Step 3-2. `Discovery Engine UserStore REST API` 기반 입·퇴사 자동화 연동하기
 
 > **핵심 포인트:**  
-> `Google Workspace`를 쓰지 않으므로 인사 연동 `API`도 **`Discovery Engine UserStore REST API`** 하나로 일원화됩니다. `batchUpdateUserLicenses` 호출 한 번으로 **신규 입사자 좌석 부여(`licenseConfig` 명시)** 와 **퇴사·휴면자 좌석 회수(`licenseConfig` 생략 + `deleteUnassignedUserLicenses: true`)** 를 동시에 처리합니다.
+> `Google Workspace`를 쓰지 않으므로 인사 연동 `API`도 **`Discovery Engine UserStore REST API`** 하나로 일원화됩니다. `batchUpdateUserLicenses` 호출 한 번으로 **신규 입사자 `Seat` 할당(`licenseConfig` 명시)** 와 **퇴사·휴면자 `Seat` 회수(`licenseConfig` 생략 + `deleteUnassignedUserLicenses: true`)** 를 동시에 처리합니다.
 
-![Non-GWS 인사 연동 및 GE+Antigravity 양방향 휴면 좌석 회수 Architecture](assets/screenshots/diagram-ge-admin-2-license-lifecycle-automation.png)
+![Non-GWS 인사 연동 및 GE+Antigravity 양방향 휴면 Seat 회수 Architecture](assets/screenshots/diagram-ge-admin-2-license-lifecycle-automation.png)
 
 1. 사내 인사 연동 Batch용 `Service Account`에 `roles/discoveryengine.admin` 권한을 부여하고 모든 요청에 `X-Goog-User-Project: PROJECT_ID` `Header`를 포함합니다.
 2. 실습 `File` `02_UserStore_license_list_and_batch_update.sh`의 조회 및 일괄 변경 `REST API` 명령을 복사해 실행 구조를 확인합니다:
 
 ```bash
-# 1) 전체 사용자 License 배정 상태 및 마지막 Sign-in 시각(lastLoginTime) 조회 (userLicenses.list)
-#    좌석 없이 접속을 시도한 사용자만 보려면 URL 끝에 &filter=licenseAssignmentState%3DNO_LICENSE_ATTEMPTED_LOGIN 을 붙입니다.
+# 1) 전체 사용자 Seat 할당 상태 및 마지막 Sign-in 시각(lastLoginTime) 조회 (userLicenses.list)
+#    `Seat` 없이 접속을 시도한 사용자만 보려면 URL 끝에 &filter=licenseAssignmentState%3DNO_LICENSE_ATTEMPTED_LOGIN 을 붙입니다.
 curl -sS -X GET \
   -H "Authorization: Bearer $(gcloud auth print-access-token)" \
   -H "X-Goog-User-Project: PROJECT_ID" \
   "https://discoveryengine.googleapis.com/v1/projects/PROJECT_ID/locations/global/userStores/default_user_store/userLicenses?pageSize=1000"
 
-# 2) 신규 입사자 배정 + 퇴사/휴면자 좌석 회수 일괄 실행 (batchUpdateUserLicenses)
+# 2) 신규 입사자 Seat 할당 + 퇴사/휴면자 Seat 회수 일괄 실행 (batchUpdateUserLicenses)
 curl -sS -X POST \
   -H "Authorization: Bearer $(gcloud auth print-access-token)" \
   -H "X-Goog-User-Project: PROJECT_ID" \
@@ -315,10 +315,10 @@ curl -sS -X POST \
 
 ---
 
-### Step 3-3. 좌석 회수 전 30일 사용 여부 확인: `last_login_time`과 `Antigravity` `Log` 함께 보기
+### Step 3-3. Seat 회수 전 30일 사용 여부 확인: `last_login_time`과 `Antigravity` `Log` 함께 보기
 
 > **핵심 포인트:**  
-> `Manage users`의 `last_login_time`은 사용자가 마지막으로 Sign-in한 시각입니다. `Antigravity`만 쓰는 개발자는 Web App 활동이 거의 없을 수 있으므로 좌석을 회수하기 전에 `Antigravity` `inference_response` `Log`에 최근 호출이 있는지도 확인합니다. **`last_login_time`이 30일보다 오래됐고 `Antigravity` 호출도 없는 계정만 회수 대상**으로 잡습니다.
+> `Manage users`의 `last_login_time`은 사용자가 마지막으로 Sign-in한 시각입니다. `Antigravity`만 쓰는 개발자는 Web App 활동이 거의 없을 수 있으므로 `Seat`를 회수하기 전에 `Antigravity` `inference_response` `Log`에 최근 호출이 있는지도 확인합니다. **`last_login_time`이 30일보다 오래됐고 `Antigravity` 호출도 없는 계정만 회수 대상**으로 잡습니다.
 
 1. **`Logging` > `Logs Storage`** 에서 `_Default` Bucket을 `Observability Analytics`용으로 Upgrade합니다. 한 번 Upgrade하면 되돌릴 수 없고 새 `Log` 반영까지 30~60분이 걸립니다.
 2. `Logs Explorer`에서 `logName="projects/PROJECT_ID/logs/businessaicode.googleapis.com%2Finference_response"` 로 `Log`가 들어오는지 먼저 확인합니다.
@@ -351,9 +351,9 @@ ORDER BY
 
 ---
 
-### [Part 3 추가 확인 과제 · 선택] 휴직자 좌석 회수 후 복직 시 자산 보존 검증
+### [Part 3 추가 확인 과제 · 선택] 휴직자 Seat 회수 후 복직 시 자산 보존 검증
 
-* 테스트 계정의 좌석을 `batchUpdateUserLicenses`로 회수한 뒤 같은 `userPrincipal`로 다시 배정했을 때 기존 `NotebookLM` 자료와 `Saved Memory`가 그대로 보이는지 확인해 보세요.
+* 테스트 계정의 `Seat`를 `batchUpdateUserLicenses`로 회수한 뒤 같은 `userPrincipal`로 다시 `Seat`를 할당했을 때 기존 `NotebookLM` 자료와 `Saved Memory`가 그대로 보이는지 확인해 보세요.
 
 ---
 
