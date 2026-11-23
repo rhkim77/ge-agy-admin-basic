@@ -27,7 +27,8 @@
 > `L100 · L200` 실습에서 사용하는 설정 Template 7종(`YAML` · `Option A/B 병렬 IAM Script` · `UserStore REST API` · `Log Analytics SQL` · `MCP JSON`)을 압축본 하나로 묶었습니다. 시작 전에 실습 `File` 묶음과 **18장 발표 자료(`GE_Antigravity_Admin_Slides.pdf`)** 를 먼저 내려받으세요.
 >
 > • <a href="./GE_Antigravity_Admin_Files.zip" download="GE_Antigravity_Admin_Lab_Files.zip"><strong>[Admin 실습 File 7종 전체 ZIP 한 번에 Download (GE_Antigravity_Admin_Lab_Files.zip)]</strong></a>  
-> • <a href="./GE_Antigravity_Admin_Slides.pdf" download="GE_Antigravity_Admin_Slides.pdf" target="_blank"><strong>[18-Slide 발표 자료 PDF 바로 열기 (GE_Antigravity_Admin_Slides.pdf)]</strong></a>
+> • <a href="./GE_Antigravity_Admin_Slides.pdf" download="GE_Antigravity_Admin_Slides.pdf" target="_blank"><strong>[18-Slide 발표 자료 PDF 바로 열기 (GE_Antigravity_Admin_Slides.pdf)]</strong></a>  
+> • <a href="./console-reference.html"><strong>[부록: GCP Console 전체 설정 항목 Reference Guide (28개 화면 Capture 해설)]</strong></a>
 
 <details class="file-list-details">
 <summary><strong>개별 실습 File 7종 상세 역할 및 개별 Download 보기 (클릭하여 펼치기)</strong></summary>
