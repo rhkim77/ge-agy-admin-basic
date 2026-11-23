@@ -2,7 +2,7 @@
 
 > <strong>Non-GWS 기업 맞춤 Step-by-Step 관리자 실습 Guide</strong>  
 > **Google Workspace (GWS)** 를 사용하지 않고 **Gemini Enterprise Standard (500석, NotebookLM 포함)** 와 **Google Antigravity** 두 가지 핵심 Solution만 도입한 환경에 맞추어, **① `Console` 어디를 클릭하는지** → **② 어떤 `CLI` · `REST API` · `SQL` · `JSON`을 복사해 실행하는지** → **③ 설정 뒤 무엇을 확인하는지** 순서대로 따라오실 수 있도록 구성했습니다.  
-> `Google Cloud Console` 그림은 설명을 위해 다시 그린 것이어서 실제 화면과 배치나 문구가 다를 수 있습니다. `Antigravity CLI` Sign-in 화면 2장만 실제 화면을 캡처했습니다.
+> 본 Guide의 `Google Cloud Console` · `Gemini Enterprise Web App` · `agy CLI` 화면은 실제 테스트 환경을 촬영한 뒤, `Project ID` · `Domain` · `Account` 식별자만 일반 예시(`corp-ai-platform-prod`, `example-corp.com`)로 치환하고 강조 번호를 표시한 화면입니다.
 
 ---
 
@@ -59,7 +59,7 @@
 3. 향후 신규 `Microsoft 365 Connector` 연결이나 `SDP` · `Model Armor` 보안 정책 변경 시 반드시 **`App 2 (Sandbox)`에서 먼저 영향도를 검증한 뒤 `App 1`에 반영**합니다.
 
 **화면 확인 포인트:** (`① 상단 Region: global 불변 경계 확인` → `② 동일 Project 내 $0 무과금 Sandbox App 2 병렬 구성`)
-![Step 1-1 배포 Location 불변 원칙 및 동일 Project 내 무과금 2-App 분리 화면 (설명용으로 다시 그린 화면)](assets/screenshots/ui_01_apps_location_2app.png)
+![Step 1-1 배포 Location 불변 원칙 및 동일 Project 내 무과금 2-App 분리 화면 (실제 Console 화면 촬영 · 식별자 일반화 편집)](assets/screenshots/ui_01_apps_location_2app.png)
 
 ---
 
@@ -107,7 +107,7 @@ gcloud projects add-iam-policy-binding PROJECT_ID \
   --role="projects/PROJECT_ID/roles/geStandardChatUser"
 ```
 
-![Option A: Workforce Identity Federation 설정 및 소문자 Email 매핑 화면 (설명용으로 다시 그린 화면)](assets/screenshots/ui_02_settings_identity_wif.png)
+![Option A: Workforce Identity Federation 설정 및 소문자 Email 매핑 화면 (실제 Console 화면 촬영 · 식별자 일반화 편집)](assets/screenshots/ui_02_settings_identity_wif.png)
 
 
 
@@ -141,7 +141,7 @@ gcloud projects add-iam-policy-binding PROJECT_ID \
 
    - **임직원·개발자 접속 안내**: `Antigravity` 및 모든 `IDE`(`Android Studio` 포함)에서 `Use Business Account` → 파란색 **`Continue with Google Cloud` 버튼 원클릭**으로 즉시 진입하며 개인 `@gmail.com` Cookie와 섞이지 않도록 **업무 전용 `Chrome / Edge Profile` 생성**을 함께 안내합니다.
 
-![Option B: Cloud Identity Free ($0) Google Admin Console 및 GCP Settings > Authentication 설정 화면 (설명용으로 다시 그린 화면)](assets/screenshots/ui_02b_cloud_identity_free_setup.png)
+![Option B: Cloud Identity 조직 Directory 및 IAM & Admin > Groups 설정 화면 (실제 Console 화면 촬영 · 식별자 일반화 편집)](assets/screenshots/ui_02b_cloud_identity_free_setup.png)
 
 ---
 
@@ -171,7 +171,7 @@ gcloud iam roles describe geStandardChatUser --project=PROJECT_ID \
    - **인사 · `SIEM` 자동화 `Service Account`**: `roles/discoveryengine.admin` (인사 연동용), `roles/logging.privateLogViewer` (`Log` 수집용)
 
 **화면 확인 포인트:** (`① Canvas용 immersiveArtifacts.* 권한 유지` → `② businessaicode.* 5종 제거로 일반 임직원의 Antigravity 사용 차단` → `③ Admin+User AND 조건 확인`)
-![Step 1-3 일반 임직원용 Antigravity 차단 Custom IAM Role 상세 및 Admin AND 권한 주의사항 (설명용으로 다시 그린 화면)](assets/screenshots/ui_03_iam_custom_role_no_agy.png)
+![Step 1-3 일반 임직원용 Antigravity 차단 Custom IAM Role 상세 및 Admin AND 권한 주의사항 (실제 Console 화면 촬영 · 식별자 일반화 편집)](assets/screenshots/ui_03_iam_custom_role_no_agy.png)
 
 ---
 
@@ -195,7 +195,7 @@ gcloud iam roles describe geStandardChatUser --project=PROJECT_ID \
 3. 특정 헤비 유저 1인이 전사 주간 `Antigravity Credit`(`USD 1,250`)을 독점 소진하지 못하도록 **`Limit any single-user's quota (Multiplier)` 값을 `10`** (1인당 주간 최대 `USD 25` 상한; 집중 통제 시 `5`)으로 입력하고 **`SAVE`** 를 클릭합니다.
 
 **화면 확인 포인트:** (`① Pay-as-you-go = Disabled 유지로 초과 과금 $0 보장` → `② Multiplier = 10 설정으로 개발자 1인당 주간 최대 $25 상한 적용`)
-![Step 2-1 Standard 500석 공유 Quota 및 Antigravity 주간 Credit 예산 보호 설정 화면 (설명용으로 다시 그린 화면)](assets/screenshots/ui_04_usage_spend_quota.png)
+![Step 2-1 Standard 500석 공유 Quota 및 Antigravity 주간 Credit 예산 보호 설정 화면 (실제 Console 화면 촬영 · 식별자 일반화 편집)](assets/screenshots/ui_04_usage_spend_quota.png)
 
 ---
 
@@ -212,10 +212,10 @@ gcloud iam roles describe geStandardChatUser --project=PROJECT_ID \
 3. **현업 대용량 문서 문의 대응 기준**: 일반 `Assistant Chat`은 단일 `Session` 누적 **`800,000 Tokens`** 및 확장자별 크기 상한(`.json` 1 MB, `.md/.py` 2 MB, `.docx/.html` 3 MB, `.txt/.csv` 7 MB, `.xlsx` 압축 해제 50 MB / 1,500만 `Cells`, `.pdf/.pptx` 100 MB)이 적용되므로, **5 MB 이상의 규정집·심의 기준서는 문서당 `500 MB` 로컬 업로드를 지원하는 `Gemini Notebook Enterprise` 또는 `Projects > Knowledge`에 올리도록 안내**합니다. 민감정보가 든 문서를 `NotebookLM`에 올리게 하려면 Step 4-1의 `NotebookLM` 확인 사항을 먼저 점검합니다.
 
 **화면 확인 포인트 1 (`Admin Console`):** (`① Enable canvas & App builder ON` → `② Google Drive upload OFF 확인` → `③ 1P Gemini Model 노출 제어`)
-![Step 2-2 Configurations > Feature Management 내 Non-GWS 필수 설정 화면 (설명용으로 다시 그린 화면)](assets/screenshots/ui_05_feature_management_canvas.png)
+![Step 2-2 Configurations > Feature Management 내 Non-GWS 필수 설정 화면 (실제 Console 화면 촬영 · 식별자 일반화 편집)](assets/screenshots/ui_05_feature_management_canvas.png)
 
 **화면 확인 포인트 2 (`사용자 Web App`):** (`Canvas` 활성화 즉시 우측 편집창에서 발표 자료·문서를 생성하고 `.pptx` / `.pdf` / `.docx` 로컬 `File`로 바로 `Download`)
-![Step 2-2 사용자 Web App 내 Canvas 로컬 PPTX 및 PDF 직접 Download 실행 화면 (설명용으로 다시 그린 화면)](assets/screenshots/ui_05b_canvas_local_download.png)
+![Step 2-2 사용자 Web App 내 Canvas 로컬 PPTX 및 PDF 직접 Download 실행 화면 (실제 Web App 화면 촬영 · 식별자 일반화 편집)](assets/screenshots/ui_05b_canvas_local_download.png)
 
 ---
 
@@ -268,7 +268,7 @@ gcloud projects add-iam-policy-binding PROJECT_ID \
    - CSV의 상태 값은 `ASSIGNED` · `NO_LICENSE` · `BLOCKED` 세 가지입니다. 좌석 없이 접속을 시도한 사용자는 `REST API`의 `licenseAssignmentState = NO_LICENSE_ATTEMPTED_LOGIN` Filter로 조회합니다(Step 3-2).
 
 **화면 확인 포인트:** (`① 정원 근접 시 Auto-Assign OFF` → `② Export all users로 CSV 추출` → `③ last_login_time이 빈 계정 확인`)
-![Step 3-1 Manage users 내 자동 배정 제어, CSV 내보내기 및 UserStore 상태 조회 화면 (설명용으로 다시 그린 화면)](assets/screenshots/ui_07_manage_users_csv_reclaim.png)
+![Step 3-1 Manage users 내 자동 배정 제어, CSV 내보내기 및 UserStore 상태 조회 화면 (실제 Console 화면 촬영 · 식별자 일반화 편집)](assets/screenshots/ui_07_manage_users_csv_reclaim.png)
 
 ---
 
@@ -344,10 +344,10 @@ ORDER BY
 
 4. Step 3-1에서 받은 CSV의 `last_login_time`과 위 결과를 사용자 Email로 맞춰 보고 두 조건을 모두 만족하는 계정만 Step 3-2의 `batchUpdateUserLicenses`로 회수합니다.
 
-이 Query는 공식 문서의 `Log` 구조(`labels.user_id`, `log_id`)를 따랐습니다. 운영 환경에서는 2번 확인을 거친 뒤 사용합니다. Web App 쪽 사용자별 집계는 실습 `File`의 Query [B]에 있습니다. 다만 `gemini_enterprise_user_activity` `Log`의 `userIamPrincipal` 값은 `Enable logging of prompt inputs and response outputs` 설정이 꺼져 있으면 `<elided>`로 남습니다. 이 설정은 Prompt와 답변 원문까지 저장하므로 보안 담당자와 협의해 결정합니다. 켜지 않는 경우 Web App 쪽은 `last_login_time`으로 판단합니다.
+`_Default` `Log Bucket`을 처음 조회할 때는 좌측 `Views > Logs`의 `+ Upgrade log bucket`으로 `Log Analytics`를 활성화하거나 우측 상단 설정 아이콘에서 `BigQuery` 엔진으로 전환한 뒤 실행합니다. 이 Query는 공식 문서의 `Log` 구조(`labels.user_id`, `log_id`)를 따랐습니다. 운영 환경에서는 2번 확인을 거친 뒤 사용합니다. Web App 쪽 사용자별 집계는 실습 `File`의 Query [B]에 있습니다. 다만 `gemini_enterprise_user_activity` `Log`의 `userIamPrincipal` 값은 `Enable logging of prompt inputs and response outputs` 설정이 꺼져 있으면 `<elided>`로 남습니다. 이 설정은 Prompt와 답변 원문까지 저장하므로 보안 담당자와 협의해 결정합니다. 켜지 않는 경우 Web App 쪽은 `last_login_time`으로 판단합니다.
 
 **화면 확인 포인트:** (`① Antigravity 호출이 있는 사용자는 회수 대상에서 제외` → `② last_login_time과 함께 판단`)
-![Step 3-3 Observability Analytics에서 Antigravity 사용자별 30일 호출을 조회하는 화면 (설명용으로 다시 그린 화면, 예시 Data)](assets/screenshots/ui_08_seat_activity_query.png)
+![Step 3-3 Observability Analytics에서 Antigravity 사용자별 30일 호출을 조회하는 화면 (실제 Console 화면 촬영 · 식별자 일반화 편집)](assets/screenshots/ui_08_seat_activity_query.png)
 
 ---
 
@@ -381,7 +381,7 @@ gcloud projects add-iam-policy-binding PROJECT_ID \
 3. 이어서 좌측 **`Configurations` > `ASSISTANT` `Tab`** 에서 **`Enable Model Armor`** 를 켜고 `locations/us`에 생성된 입력용(`ge-prod-input-guard`)과 출력용(`ge-prod-output-guard`) `Template`의 `Resource name`을 각각 입력하고 저장합니다.
 
 **화면 확인 포인트:** (`① SDP 바인딩 전 roles/dlp.user 선행 부여` → `② Model Armor는 반드시 locations/us(또는 eu) 생성` → `③ 입력/출력 Template 분리 후 저장`)
-![Step 4-1 & 4-2 GE Web App 2계층 보안(SDP Content Policy 및 Multi-Region Model Armor 입출력 분리) 설정 화면 (설명용으로 다시 그린 화면)](assets/screenshots/ui_09_security_sdp_model_armor.png)
+![Step 4-1 & 4-2 GE Web App 2계층 보안(SDP Content Policy 및 Multi-Region Model Armor 입출력 분리) 설정 화면 (실제 Console 화면 촬영 · 식별자 일반화 편집)](assets/screenshots/ui_09_security_sdp_model_armor.png)
 
 ---
 
@@ -418,7 +418,7 @@ gcloud projects add-iam-policy-binding PROJECT_ID \
 3. 하단 **`Compliance`** 섹션에서 **`Metadata logging`**(기본값 `Disabled`)을 **`Enabled`** 로 바꾸고 저장합니다. 사용자·`Model`별 `Token` 사용량이 `Log`에 기록되어 Step 3-3의 확인과 `Developer tools metrics` 조회에 쓰입니다.
 
 **화면 확인 포인트:** (`① Terminal 실행 정책 Require review + Sandbox ON 상향` → `② 승인된 사내 MCP JSON Allowlist 등록` → `③ Metadata logging = Enabled 전환`)
-![Step 4-3 Settings > AI developer tools 내 Antigravity 로컬 실행 보안, MCP Allowlist 및 Metadata Logging 설정 화면 (설명용으로 다시 그린 화면)](assets/screenshots/ui_06_antigravity_settings_security.png)
+![Step 4-3 Settings > AI developer tools 내 Antigravity 로컬 실행 보안, MCP Allowlist 및 Metadata Logging 설정 화면 (실제 Console 화면 촬영 · 식별자 일반화 편집)](assets/screenshots/ui_06_antigravity_settings_security.png)
 
 ---
 
@@ -460,7 +460,7 @@ gcloud pubsub topics add-iam-policy-binding ge-security-siem-topic \
 > • **Phase 2 특화 `Agent` 통합 주의사항**: 사내에서 따로 만든 `Domain` 특화 `Agent`나 `Multimodal ADK Agent`를 `Agent Registry · Agent Gateway`로 연결할 때, `GE` 기본 `Model Armor`는 외부 `ADK Runtime` 내부를 자동 감싸지 않으므로 **외부 `ADK Agent` Code 내부에도 동일한 `Model Armor`와 `OTel Trace`를 내장**해야 합니다.  
 > • **비용 조회**: `Cloud Billing` `Report`에서 `Gemini Enterprise`를 **`Originating products`** Filter로 걸고 `SKU`별로 묶으면 항목별 비용을 볼 수 있습니다. `Antigravity` 사용분이 어떤 `SKU`로 표시되는지는 실제 `Report`에서 확인합니다.
 
-![Step 5-1 & 5-2 통합 5대 Log Router 구성 및 Non-GWS 지식 확장(Microsoft 365 data store · Agent Gateway) 화면 (설명용으로 다시 그린 화면)](assets/screenshots/ui_10_logging_sink_and_m365.png)
+![Step 5-1 & 5-2 통합 5대 Log Router 구성 및 Non-GWS 지식 확장(Microsoft 365 data store · Agent Gateway) 화면 (실제 Console 화면 촬영 · 식별자 일반화 편집)](assets/screenshots/ui_10_logging_sink_and_m365.png)
 
 ![Phase 2 Non-GWS 지식 확장 및 Agent Gateway 통합 Roadmap Architecture](assets/screenshots/diagram-ge-admin-3-phase2-connector-gateway-roadmap.png)
 
