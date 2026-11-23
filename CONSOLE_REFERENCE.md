@@ -1,51 +1,32 @@
-# Gemini Enterprise GCP Console 전체 설정 항목 Reference Guide
+# Gemini Enterprise GCP Console 전체 설정 항목 Reference Portal
 
-> **범용 관리자 Reference Guide (Project 전역 설정 + 개별 App 설정 전수 해설)**  
-> 본 문서는 **Google Cloud Console**의 **Gemini Enterprise** 화면에 노출되는 모든 메뉴와 설정 항목을 **Part A (`Project` · `Location` 전역 설정)** 와 **Part B (개별 `App` 수준 설정)** 두 계층으로 나누어, 실제 `Console` `Capture` 이미지와 함께 항목별 기능·기본값·실무 권장값·주의사항을 정리한 범용 운영 지침서입니다.  
-> 모든 화면은 실제 `Google Cloud Console`을 촬영한 뒤 `Project ID`·`App ID`·계정 식별자만 일반 예시(`corp-ai-platform-prod`, `corp-ge-prod-app`, `example-corp.com`)로 일반화했습니다.
+> <strong>범용 관리자 Reference Guide (Project 전역 설정 + 개별 App 설정 전수 해설)</strong>  
+> **Google Cloud Console**의 **Gemini Enterprise** 화면에 노출되는 모든 메뉴와 설정 항목을 **Part A (`Project` · `Location` 전역 설정)** 와 **Part B (개별 `App` 수준 설정)** 두 계층으로 나누어, 실제 `Console` `Capture` 화면 28종 및 `Architecture Diagram` 2종과 함께 항목별 기능·기본값·실무 권장값·주의사항을 정리했습니다.  
+> 모든 화면은 실제 `Google Cloud Console`을 촬영한 뒤 `Project ID`·`App ID`·계정 식별자만 일반 예시(`corp-ai-platform-prod`, `corp-ge-prod-app`, `example-corp.com`)로 치환했습니다.
 
 ---
 
 ## 0. 설정 계층 구조 한눈에 보기 (`Project` 전역 vs. 개별 `App`)
 
-`Gemini Enterprise` 관리 화면은 **어느 계층에서 설정이 적용되는지**를 구분하는 것이 가장 중요합니다. `Authentication`, `CMEK`, `AI developer tools`, `Gemini Notebook` 보안 정책처럼 **`Project` + `Location` 단위로 전체 `App`에 공통 적용되는 설정**과, `Feature Management`, `Assistant`, `Model Armor`, `Search UI`처럼 **개별 `App`마다 독립적으로 켜고 끌 수 있는 설정**이 명확히 나뉩니다.
+`Gemini Enterprise` 관리 화면은 **어느 계층에서 설정이 적용되는지(`Scope`)** 를 구분하는 것이 가장 중요합니다. `Authentication`, `CMEK`, `AI developer tools`, `Gemini Notebook` 보안 정책처럼 **`Project` + `Location` 단위로 전체 `App`에 공통 적용되는 설정**과, `Feature Management`, `Assistant`, `Model Armor`, `Search UI`처럼 **개별 `App`마다 독립적으로 켜고 끌 수 있는 설정**이 명확히 나뉩니다.
 
-```mermaid
-flowchart TB
-    subgraph PROJ["Part A. Project / Location 전역 계층 (Gemini Enterprise 루트 메뉴)"]
-        direction LR
-        A1["Apps / Data stores<br/>리소스 목록·생성"]
-        A2["Manage users<br/>Seat 할당·자동등록"]
-        A3["Usage & spend / Plans<br/>공유 Quota·PAYG·구독"]
-        A4["Settings (4 Tabs)<br/>CMEK · Auth · RAC · AI Dev Tools"]
-        A5["Developer tools metrics<br/>Antigravity 사용량 지표"]
-    end
-
-    subgraph APP["Part B. 개별 App 계층 (Apps > App 선택)"]
-        direction LR
-        B1["Overview · Integration<br/>Web/Mobile URL · API"]
-        B2["Data stores · Actions<br/>Prompt chips · Agents"]
-        B3["Configurations (7 Tabs)<br/>Autocomplete · Search UI · Control<br/>Assistant · KG · Feature Mgmt · Observability"]
-        B4["Security · Analytics<br/>Agent Gateway · Model Armor<br/>SDP · 사용량 Dashboard"]
-    end
-
-    PROJ -->|"공통 인증·암호화·Seat·Quota 상속"| APP
-```
+![GCP Console 설정 계층 구조 조감도: Project 전역(Part A) vs. 개별 App(Part B)](assets/console_ref/diagram-console-ref-1-scope-hierarchy.png)
 
 | 구분 | 적용 범위 (`Scope`) | 대표 설정 항목 | 운영 시 주의점 |
 | :--- | :--- | :--- | :--- |
 | **Part A. `Gemini Enterprise` 전역** | `Project` + `Location` (`global` / `us` / `eu`) 전체 | `Apps`, `Data stores`, `Manage users`, `Usage & spend`, `Developer tools metrics`, `Settings`(`CMEK`, `Authentication`, `Resource access control`, `AI developer tools`), `Plans & billing` | `Authentication`, `AI developer tools`, `Gemini Notebook` 보안은 동일 `Project` 내 모든 `App`에 공통 적용됨 |
-| **Part B. 개별 `App` 설정** | 선택한 단일 `App` (`Engine`) 내부 | `Overview`, `Connected data stores`, `Actions`, `Prompt chips`, `Configurations` 7개 `Tab`, `Agents`, `Security`, `Integration`, `Analytics` | 운영 `App`과 검증(`Sandbox`) `App`을 분리해 신규 `Connector`·`Feature Toggle`·`Model Armor`를 선검증할 때 활용 |
+| **Part B-1. 개별 `App` · 7대 `Configurations`** | 선택한 단일 `App` (`Engine`) 내부 | `Overview`, `Connected data stores`, `Actions`, `Prompt chips`, `Configurations` 7개 `Tab`(`Autocomplete`, `Search UI`, `Control`, `Assistant`, `Knowledge Graph`, `Feature Management`, `Observability`) | 운영 `App`과 검증(`Sandbox`) `App`을 분리해 신규 `Connector`·`Feature Toggle`·시스템 지침을 선검증할 때 활용 |
+| **Part B-2. 개별 `App` 에이전트 · 보안 · 배포** | 선택한 단일 `App` (`Engine`) 내부 (일부 `Notebook` 항목은 전역) | `Agents`, `Security`(`Insights`, `Agent Gateway`, `CMEK`, `Model Armor`, `SDP`), `Integration`, `Analytics` | `Security > Configuration` 안에서도 `Gemini Notebook`용 `Model Armor`·`SDP`는 `Project` 전체 `App`에 공통 적용됨 |
 
 ---
 
-# Part A. `Gemini Enterprise` 전역 (`Project` · `Location` 수준) 설정
+# [Part A] `Gemini Enterprise` 전역 (`Project` · `Location` 수준) 설정
 
 좌측 `Gemini Enterprise` 루트 메뉴는 <strong><code>Project</code> 전체의 <code>App</code>·<code>Data Store</code> 자산 관리, <code>Seat</code> 라이선스, 공유 <code>Quota</code>, 전역 보안·인증(<code>Settings</code>)</strong>을 담당합니다.
 
 ---
 
-## A-1. `Apps` (앱 목록 및 `Location` 관리)
+### Menu A-1. `Apps` (앱 목록 및 `Location` 관리)
 
 동일 `Project`와 선택한 `Location`(`global`, `us`, `eu`)에 생성된 모든 `Gemini Enterprise` `App`을 조회하고 신규 `App`을 생성(`Create app`)하는 시작 화면입니다.
 
@@ -60,7 +41,7 @@ flowchart TB
 
 ---
 
-## A-2. `Data stores` (`Project` 수준 데이터 소스 저장소)
+### Menu A-2. `Data stores` (`Project` 수준 데이터 소스 저장소)
 
 `Google Cloud Storage`, `BigQuery`, `Microsoft 365`, `Confluence`, `Jira`, `ServiceNow` 등 사내 데이터를 색인(`Ingestion`)하거나 실시간 연합 검색(`Federation`)하는 `Data Store`를 생성·관리합니다.
 
@@ -74,7 +55,7 @@ flowchart TB
 
 ---
 
-## A-3. `Manage users` (`Seat` 라이선스 할당 · 자동 등록 · 현황 추출)
+### Menu A-3. `Manage users` (`Seat` 라이선스 할당 · 자동 등록 · 현황 추출)
 
 `Location`별 `Gemini Enterprise` 구독(`Subscription`) 현황을 확인하고, 사용자별 `Seat`를 할당·회수하거나 전체 사용자 목록을 `CSV`로 내려받는 핵심 운영 화면입니다.
 
@@ -90,7 +71,7 @@ flowchart TB
 
 ---
 
-## A-4. `Usage & spend` (공유 `Quota` 풀 · `PAYG` 초과 과금 · 개인 상한)
+### Menu A-4. `Usage & spend` (공유 `Quota` 풀 · `PAYG` 초과 과금 · 개인 상한)
 
 동일 `Project`·`Location`·`Edition` 사용자 전체가 공유하는 `Storage` 및 기능별 `Quota` 소진율을 모니터링하고, 초과 사용(`Pay-as-you-go`)과 단일 사용자 상한(`Multiplier`)을 통제합니다.
 
@@ -103,12 +84,12 @@ flowchart TB
 | **`Foundational Engagement Layer`** | `Assistant and Search`(`Standard` 160 / `Plus` 200 `Queries`/일/`Seat`), `Video`, `Image`, `Deep research` 일일 공유 `Pool` 소진율 (매일 `00:00 PT` 초기화) | `500 Seats` `Standard` 기준 `Assistant`는 일 `80,000 Queries` 공유 `Pool` |
 | **`1:1 Personal Agents` (`No-code Agents`)** | 일일 `No-code Agent` 생성 및 외부 `Agent` 등록 건수 소진율 (`Standard` 1 / `Plus` 10 `Agents`/일/`Seat`) | `ADK`·`A2A` 외부 `Agent` 등록도 1건으로 차감됨 |
 | **`Coding Tools` (`Antigravity`)** | `Antigravity` · `Antigravity IDE` · `Android Studio` 합산 주간 `Credit` 공유 `Pool` (`Standard` 월 `$10` → 주 `$2.50`/`Seat`, `Plus` 월 `$15` → 주 `$3.75`/`Seat`) | 최초 `Token` 소비 시점부터 <strong>7일 동적 주기(<code>Rolling 7-day</code>)</strong>로 초기화되며 미사용분 이월 불가 |
-| **`Pay-as-you-go usage above quota`** (하단 설정) | 공유 `Pool` 소진 후 종량제 초과 과금 허용 여부 | 예산 통제가 필요한 초기 운영 단계는 **`Disabled` 권장** (단, `3rd-party Model` 활성화 시에는 `PAYG` 활성화 필요) |
-| **`Single-user quota limit` (`Multiplier`)** (하단 설정) | 소수 사용자의 전사 `Pool` 독점을 막기 위한 개인 상한 배수 (정수 `1` 이상, 기본 제안값 `10x`) | **`Enabled` + `Multiplier = 10` 권장** (예: `Standard` `Assistant` 1인 일 1,600 `Queries`, `Antigravity` 주 `$25` 상한) |
+| **`Pay-as-you-go usage above quota`** | 공유 `Pool` 소진 후 종량제 초과 과금 허용 여부 | 예산 통제가 필요한 초기 운영 단계는 **`Disabled` 권장** (단, `3rd-party Model` 활성화 시에는 `PAYG` 활성화 필요) |
+| **`Single-user quota limit` (`Multiplier`)** | 소수 사용자의 전사 `Pool` 독점을 막기 위한 개인 상한 배수 (정수 `1` 이상, 기본 제안값 `10x`) | **`Enabled` + `Multiplier = 10` 권장** (예: `Standard` `Assistant` 1인 일 1,600 `Queries`, `Antigravity` 주 `$25` 상한) |
 
 ---
 
-## A-5. `Developer tools metrics` (`Antigravity` · `IDE` 사용량 지표)
+### Menu A-5. `Developer tools metrics` (`Antigravity` · `IDE` 사용량 지표)
 
 `AI developer tools`(`Antigravity`, `IDE Extension`, `Android Studio`)의 활성 사용자 수, 요청량, 추론 활동 등 개발 도구 전용 사용 지표를 확인하는 내장 `Dashboard`입니다.
 
@@ -120,7 +101,7 @@ flowchart TB
 
 ---
 
-## A-6. `Settings > CMEK` (고객 관리 암호화 키)
+### Tab A-6. `Settings > CMEK` (고객 관리 암호화 키)
 
 `Google Cloud KMS`에 보관된 고객 자체 암호화 키(`Customer-Managed Encryption Keys`)를 `Location`별로 연결해 저장 데이터(`Data at Rest`)를 암호화합니다.
 
@@ -132,7 +113,7 @@ flowchart TB
 
 ---
 
-## A-7. `Settings > Authentication` (전역 사용자 인증 `IdP` 설정)
+### Tab A-7. `Settings > Authentication` (전역 사용자 인증 `IdP` 설정)
 
 해당 `Project` 내 모든 검색·`Gemini Enterprise` `App`이 사용자 신원을 확인하고 문서 권한(`ACL`)을 적용할 때 사용할 `Identity Provider`를 `Location`별로 지정합니다.
 
@@ -144,7 +125,7 @@ flowchart TB
 
 ---
 
-## A-8. `Settings > Resource access control` (`App` · `Data Store` 단위 세분화 접근 제어)
+### Tab A-8. `Settings > Resource access control` (`App` · `Data Store` 단위 세분화 접근 제어)
 
 `Project` 전체 `IAM` 대신 **개별 `App`, `Data Store`, `Data Connector` 리소스 단위로 사용자 접근 권한을 분리**하는 기능입니다.
 
@@ -156,7 +137,7 @@ flowchart TB
 
 ---
 
-## A-9. `Settings > AI developer tools` (`Antigravity` 보안 · 감사 · 기능 · 모델 정책)
+### Tab A-9. `Settings > AI developer tools` (`Antigravity` 보안 · 감사 · 기능 · 모델 정책)
 
 `Google Antigravity`, `Antigravity CLI`, `IDE Extension`, `Android Studio` 등 `AI developer tools` 전체에 공통 적용되는 `Project` + `Location` 전역 보안·컴플라이언스·모델 정책입니다.
 
@@ -177,7 +158,7 @@ flowchart TB
 
 ---
 
-## A-10. `Plans & billing` 및 `Gemini Notebook` (`NotebookLM Enterprise`)
+### Menu A-10. `Plans & billing` 및 `Gemini Notebook` (`NotebookLM Enterprise`)
 
 좌측 하단 메뉴에서 `Gemini Enterprise` 구독 플랜(`Plans & billing`)을 관리하고, `Gemini Notebook`(`NotebookLM Enterprise`) 콘솔로 이동합니다.
 
@@ -190,13 +171,15 @@ flowchart TB
 
 ---
 
-# Part B. 개별 `App` 수준 (`Apps > [App 선택]`) 전체 설정
+# [Part B-1] 개별 `App` 리소스 및 7대 `Configurations` (`B-1 ~ B-11`)
 
-`Apps` 목록에서 특정 `App`을 클릭해 들어가면 해당 `App` 전용 좌측 메뉴(**`Overview`, `Connected data stores`, `Actions`, `Prompt chips`, `Configurations` 7개 `Tab`, `Agents`, `Security`, `Integration`, `Analytics`**)가 표시됩니다.
+`Apps` 목록에서 특정 `App`을 클릭해 들어가면 해당 `App` 전용 좌측 메뉴와 **7개 `Configurations` `Tab`** 이 표시됩니다.
+
+![개별 App 내부 메뉴 및 7대 Configurations · 4대 보안 설정 조감도](assets/console_ref/diagram-console-ref-2-app-7tabs-security.png)
 
 ---
 
-## B-1. `Overview` (`Dashboard`)
+### Menu B-1. `Overview` (`Dashboard`)
 
 선택한 `App`의 `Web App` 및 `Mobile App` 접속 `URL`을 확인·복사하고, `Go to Gemini` 버튼으로 최종 사용자 화면을 즉시 열어볼 수 있는 대시보드입니다.
 
@@ -210,7 +193,7 @@ flowchart TB
 
 ---
 
-## B-2. `Connected data stores` (연결된 데이터 소스)
+### Menu B-2. `Connected data stores` (연결된 데이터 소스)
 
 현재 `App`의 검색 및 `Assistant` 답변 근거(`Grounding`)로 연결된 `Data Store` 목록을 조회하고 신규 연결·해제를 관리합니다.
 
@@ -222,7 +205,7 @@ flowchart TB
 
 ---
 
-## B-3. `Actions` (외부 시스템 실행 `Action Connector`)
+### Menu B-3. `Actions` (외부 시스템 실행 `Action Connector`)
 
 단순 조회(`Search`)를 넘어 `Jira` 티켓 생성, `ServiceNow` 요청 등록, `Calendar` 일정 생성 등 외부 업무 시스템에 쓰기/실행 작업을 수행하는 `Action`을 연결합니다.
 
@@ -234,7 +217,7 @@ flowchart TB
 
 ---
 
-## B-4. `Prompt chips` (홈 화면 추천 프롬프트 버튼)
+### Menu B-4. `Prompt chips` (홈 화면 추천 프롬프트 버튼)
 
 `Web App` 첫 화면에 노출되어 임직원이 클릭 한 번으로 자주 쓰는 업무 질문이나 워크플로우를 실행할 수 있게 돕는 `Prompt Chip`을 구성합니다.
 
@@ -246,7 +229,7 @@ flowchart TB
 
 ---
 
-## B-5. `Configurations > Autocomplete` (검색어 자동완성)
+### Tab B-5. `Configurations > Autocomplete` (검색어 자동완성)
 
 사용자가 검색창에 질문을 입력할 때 표시되는 자동완성 제안의 개수, 최소 글자 수, 매칭 방식, 활성화 시점을 제어합니다.
 
@@ -261,7 +244,7 @@ flowchart TB
 
 ---
 
-## B-6. `Configurations > Search UI` (검색 화면 · 브랜딩 · 바로가기)
+### Tab B-6. `Configurations > Search UI` (검색 화면 · 브랜딩 · 바로가기)
 
 `Web App`과 임베디드 `Widget`의 UI 동작, 사용자 피드백, 로고 브랜딩, 홈 화면 고정 바로가기(`Pinned Links`)를 설정합니다.
 
@@ -279,7 +262,7 @@ flowchart TB
 
 ---
 
-## B-7. `Configurations > Control` (검색 제어 규칙 `Serving Controls`)
+### Tab B-7. `Configurations > Control` (검색 제어 규칙 `Serving Controls`)
 
 특정 키워드 검색 시 동의어 확장(`Synonyms`), 특정 문서 상단 고정(`Boost` / `Promote`)·하향(`Bury`), 필터(`Filter`), 리다이렉트(`Redirect`) 등 검색 랭킹 규칙을 수동 제어합니다.
 
@@ -291,7 +274,7 @@ flowchart TB
 
 ---
 
-## B-8. `Configurations > Assistant` (어시스턴트 지침 · 웹 그라운딩 · `Model Armor` · 보존 기간)
+### Tab B-8. `Configurations > Assistant` (어시스턴트 지침 · 웹 그라운딩 · `Model Armor` · 보존 기간)
 
 `Gemini Enterprise` 대화형 `Assistant`의 핵심 동작—시스템 지침, 웹 검색(`Web Grounding`), `Model Armor` 연동, `Knowledge Catalog`, 금지어, 대화 이력 보존 기간—을 설정합니다.
 
@@ -313,7 +296,7 @@ flowchart TB
 
 ---
 
-## B-9. `Configurations > Knowledge Graph` (지식 그래프)
+### Tab B-9. `Configurations > Knowledge Graph` (지식 그래프)
 
 조직 내 인물·부서·프로젝트·문서 간 엔티티 관계를 이해해 검색 및 `Assistant` 응답의 문맥 정확도를 높이는 `Knowledge Graph` 설정입니다.
 
@@ -326,7 +309,7 @@ flowchart TB
 
 ---
 
-## B-10. `Configurations > Feature Management` (최종 사용자 기능 `Toggle` 및 모델 허용)
+### Tab B-10. `Configurations > Feature Management` (최종 사용자 기능 `Toggle` 및 모델 허용)
 
 `License` 등급과 무관하게 **해당 `App`의 최종 사용자에게 어떤 기능을 노출하고 차단할지** 세밀하게 제어하는 핵심 화면입니다. (총 25개 기능 `Toggle` + `Model availability`)
 
@@ -361,7 +344,7 @@ flowchart TB
 
 ---
 
-## B-11. `Configurations > Observability` (`Core Assistant` `OpenTelemetry` · 프롬프트 로깅)
+### Tab B-11. `Configurations > Observability` (`Core Assistant` `OpenTelemetry` · 프롬프트 로깅)
 
 특정 `Agent`를 지정하지 않은 일반 질의를 처리하는 **`Core Assistant`** 의 `OpenTelemetry` 트레이스 및 프롬프트·응답 로깅을 제어합니다.
 
@@ -374,7 +357,13 @@ flowchart TB
 
 ---
 
-## B-12. `Agents` (내장 · 노코드 · 외부 `ADK`/`A2A` 에이전트 관리)
+# [Part B-2] 개별 `App` 에이전트 · 보안 · 배포 · 분석 (`B-12 ~ B-14`)
+
+좌측 하단의 `Agents`, `Security`, `Integration`, `Analytics` 메뉴는 `App`에 등록된 `Agent` 승인 거버넌스, 4대 보안 가드레일(`Agent Gateway` · `CMEK` · `Model Armor` · `SDP`), 배포 채널, 활용 지표를 담당합니다.
+
+---
+
+### Menu B-12. `Agents` (내장 · 노코드 · 외부 `ADK`/`A2A` 에이전트 관리)
 
 `Core Assistant`, `Google-made`(`Deep Research` 등), 임직원이 만든 `No-code Agent`/`Workflow`, 그리고 외부 등록 `ADK`/`A2A` `Agent` 전체를 관리하고 공유 승인 요청을 검토합니다.
 
@@ -389,7 +378,7 @@ flowchart TB
 
 ---
 
-## B-13. `Security` (`Insights` 보안 모니터링 & `Configuration` 보안 정책 통합)
+### Menu B-13. `Security` (`Insights` 보안 모니터링 & `Configuration` 보안 정책 통합)
 
 `App` 단위의 보안 위반 탐지 대시보드(`Insights`)와 **`Agent Gateway`, `CMEK`, `Model Armor`, `Sensitive Data Protection (SDP)`** 4대 보안 설정(`Configuration`)을 한 곳에서 관리합니다.
 
@@ -407,7 +396,7 @@ flowchart TB
 
 ---
 
-## B-14. `Integration` (배포 채널) & `Analytics` (사용량 분석)
+### Menu B-14. `Integration` (배포 채널) & `Analytics` (사용량 분석)
 
 `Web App`, `API`, `Chrome`, `Slack` 등 최종 사용자 배포 채널을 구성(`Integration`)하고, `App` 단위 채택률·품질·가치 지표를 분석(`Analytics`)합니다.
 
