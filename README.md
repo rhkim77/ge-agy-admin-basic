@@ -56,7 +56,7 @@
 
 1. `Google Cloud Console` → 좌측 메뉴 **`Gemini Enterprise` > `Apps`** 진입 후 상단 **`Region`** 선택기가 **`global`**(또는 운영 대상 `Location`)로 맞춰져 있는지 확인합니다.
 2. **`+ CREATE APP`** 클릭 시 표시되는 `Location` 불변 안내를 확인하고 현업 임직원 전체용 **`App 1 (Prod)`** 과 관리자 사전 검증용 **`App 2 (Sandbox)`** 를 분리 구성합니다.
-3. 향후 신규 `Microsoft 365 Connector` 연결이나 `SDP` · `Model Armor` 보안 정책 변경 시 반드시 **`App 2 (Sandbox)`에서 먼저 영향도를 검증한 뒤 `App 1`에 반영**합니다.
+3. `App` 단위로 분리되는 항목(`Data Store` 연결, `Feature Management`, `Assistant`용 `Model Armor` · `SDP`)은 **`App 2 (Sandbox)`에서 먼저 검증한 뒤 `App 1`에 반영**합니다. 반면 `Settings > Authentication`, `AI developer tools`, `Gemini Notebook` 보안 설정은 `Project` 전체에 바로 적용되며, 일반 사용자의 `App 2` 접근까지 권한으로 막으려면 `Resource access control` 또는 `App` 단위 `IAM`을 함께 설정합니다.
 
 **화면 확인 포인트:** (`① 상단 Region: global 불변 경계 확인` → `② 동일 Project 내 $0 무과금 Sandbox App 2 병렬 구성`)
 ![Step 1-1 배포 Location 불변 원칙 및 동일 Project 내 무과금 2-App 분리 화면 (실제 Console 화면 촬영 · 식별자 일반화 편집)](assets/screenshots/ui_01_apps_location_2app.png)
