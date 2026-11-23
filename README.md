@@ -390,7 +390,7 @@ gcloud projects add-iam-policy-binding PROJECT_ID \
 ### Step 4-3. `Google Antigravity` 실행 보안(`Terminal` · `Sandbox` · `Browser` · `MCP Allowlist`) 및 `Metadata Logging` 켜기
 
 > **핵심 포인트:**  
-> `Antigravity`는 개발자 PC에서 로컬 `File` 읽기/쓰기, `Terminal` 명령 실행, `Browser` 제어, `MCP` 도구 호출을 수행하므로 **`Settings > AI developer tools`** 의 초기 기본값 중 **① `Terminal auto-execution = Always proceed`(승인 없이 자동 실행) → `Require review`(사전 승인) + `Sandbox = ON`**과 **② `Compliance > Metadata logging = Disabled` → `Enabled`** 두 가지는 초기 설정 단계에서 바꿉니다.
+> `Antigravity`는 개발자 PC에서 로컬 `File` 읽기/쓰기, `Terminal` 명령 실행, `Browser` 제어, `MCP` 도구 호출을 수행하므로 **`Settings > AI developer tools`** 의 초기 기본값 중 <strong>① <code>Terminal auto-execution = Always proceed</code>(승인 없이 자동 실행) → <code>Require review</code>(사전 승인) + <code>Sandbox = ON</code></strong>과 <strong>② <code>Compliance > Metadata logging = Disabled</code> → <code>Enabled</code></strong> 두 가지는 초기 설정 단계에서 바꿉니다.
 
 1. 좌측 메뉴 **`Gemini Enterprise` > `Settings` > `AI DEVELOPER TOOLS` `Tab`** 으로 이동합니다.
 2. **`Security`** 섹션에서 아래 4가지 통제 기준을 설정합니다:
